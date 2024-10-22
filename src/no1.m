@@ -1,6 +1,14 @@
-f = imread('../images/shore.jpg');
+f = imread('../images/butterfly.bmp');
 figure, imshow(f);
-g = [0 -1 0; -1 4 -1; 0 -1 0];
+g = [1 1 2 2 2 1 1; 
+    1 2 2 4 2 2 1; 
+    2 2 4 8 4 2 2; 
+    2 4 8 16 8 4 2; 
+    2 2 4 8 4 2 2; 
+    1 2 2 4 2 2 1; 
+    1 1 2 2 2 1 1;];
+
+g = g / 140;
 
 if ndims(f) == 3
     red_channel = f(:,:,1);
@@ -19,5 +27,7 @@ end
 
 figure; imshow(uint8(result));
 
-h = uint8(convn(double(f), double(g)));
+h = uint8(convn(double(f), double(g), 'same'));
+disp(size(result));
+disp(size(h));
 figure; imshow(h);
