@@ -7,7 +7,7 @@ function img = frequencyLPF(image, type, d0, padding, n)
         n = 1;
     end
     
-    [M,N] = size(image);
+    [M,N,C] = size(image);
     f = im2double(image);
     
     P = M;
@@ -53,8 +53,11 @@ function img = frequencyLPF(image, type, d0, padding, n)
     end
     
     H = fftshift(H); 
-    G = H.*F;
-    G1 = real(ifft2(ifftshift(G))); 
-    
-    img = G1(1:M, 1:N); 
+    G = zeros(size(H));
+    for c = 1:C
+        G(:,:,c) = H .* F(:,:,c);
+    end
+    G1 = real(ifft2(ifftshift(G)));
+
+    img = G1(1:M, 1:N, :); 
 end
