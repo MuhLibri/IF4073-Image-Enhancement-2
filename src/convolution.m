@@ -1,4 +1,20 @@
 function img = convolution(image, filter)
+    if ndims(image) == 3
+        red_channel = image(:,:,1);
+        green_channel = image(:,:,2);
+        blue_channel = image(:,:,3);
+        
+        red_result = slidingWindow(double(red_channel), filter);
+        green_result = slidingWindow(double(green_channel), filter);
+        blue_result = slidingWindow(double(blue_channel), filter);
+        
+        img = cat(3, uint8(red_result), uint8(green_result), uint8(blue_result));
+    else
+        img = slidingWindow(image, filter);
+    end
+end
+
+function img = slidingWindow(image, filter)
     [img_rows, img_cols] = size(image);
     [filter_rows, filter_cols] = size(filter);
 
