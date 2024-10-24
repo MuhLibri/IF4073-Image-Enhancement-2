@@ -1,46 +1,56 @@
 function img = orderStatisticFilters(image, filter_dim, type, d)
-    if ~(strcmp(type, 'max') || strcmp(type, 'min') || strcmp(type, 'median') || strcmp(type, 'alpha-trimmed') || strcmp(type, 'midpoint'))
-        error('Invalid filter type. Supported types are: ideal, gaussian, butterworth.');
+    % Validate the filter type
+    if ~(strcmp(type, 'max') || strcmp(type, 'min') || strcmp(type, 'median') || ...
+         strcmp(type, 'alpha-trimmed') || strcmp(type, 'midpoint'))
+        error('Invalid filter type. Supported types are: max, min, median, alpha-trimmed, midpoint.');
     end
 
+    % Set default value for d in case it's not provided
     if nargin < 4
         d = 0;
     end
 
-    [img_rows, img_cols] = size(image);
+    [img_rows, img_cols, img_dims] = size(image);
 
-    filter_center = (filter_dim + 1) / 2;
+    % Define filter center
+    filter_center = floor((filter_dim + 1) / 2);
     
-    img = zeros(img_rows, img_cols);
+    img = zeros(img_rows, img_cols, img_dims);
     
     for i = 1:img_rows
         for j = 1:img_cols
-            if(i - (filter_center - 1) < 1 || j - (filter_center - 1) < 1 || ...
-               i + (filter_center - 1) > img_rows || ...
-               j + (filter_center - 1) > img_cols)
-                img(i, j) = image(i,j);
-            else
-                window = image(i-(filter_center - 1):i+(filter_center - 1), j-(filter_center - 1):j+(filter_center - 1));
-                
-                switch type
-                    case 'median'
-                        img(i, j) = median(double(window), "all");
-                    case 'max'
-                        img(i, j) = max(double(window), [], "all");
-                    case 'min'
-                        img(i, j) = min(double(window), [], "all");
-                    case 'midpoint'
-                        img(i, j) = (max(double(window), [], "all") + min(double(window), [], "all")) / 2;
-                    otherwise
-                        copy = window;
-                        for k = 1:d
-                            copy = copy(copy~=min(double(copy), [], "all"));
-                            copy = copy(copy~=max(double(copy), [], "all"));
-                        end
-                        img(i, j) = ceil(mean(copy,"all")); 
+            for k = 1:img_dims
+                % If near the boundary, copy the original pixel
+                if (i - (filter_center - 1) < 1 || j - (filter_center - 1) < 1 || ...
+                    i + (filter_center - 1) > img_rows || j + (filter_center - 1) > img_cols)
+                    img(i, j, k) = image(i,j,k);
+                else
+                    % Extract the window of pixels
+                    window = image(i-(filter_center - 1):i+(filter_center - 1), ...
+                                   j-(filter_center - 1):j+(filter_center - 1), k);
+                    
+                    switch type
+                        case 'median'
+                            img(i, j, k) = median(double(window), "all");
+                        case 'max'
+                            img(i, j, k) = max(double(window), [], "all");
+                        case 'min'
+                            img(i, j, k) = min(double(window), [], "all");
+                        case 'midpoint'
+                            img(i, j, k) = (max(double(window), [], "all") + min(double(window), [], "all")) / 2;
+                        case 'alpha-trimmed'
+                            % Flatten the window into a vector and sort it
+                            sorted_window = sort(double(window(:)));
+
+                            % Remove d smallest and d largest values, ensuring d is not too large
+                            trim_d = min(d, floor(length(sorted_window) / 2));
+                            trimmed_window = sorted_window(1+trim_d:end-trim_d);
+
+                            % Compute the mean of the trimmed window
+                            img(i, j, k) = mean(trimmed_window, "all");
+                    end
                 end
             end
-            
         end
     end
 end
