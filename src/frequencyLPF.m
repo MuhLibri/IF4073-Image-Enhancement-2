@@ -12,25 +12,13 @@ function img = frequencyLPF(image, type, d0, padding, n)
     
     P = M;
     Q = N;
-    fp = f;
     
     if(padding)
         P = 2*M;
         Q = 2*N;
-        fp = zeros([P, Q]);
-
-        for i = 1:P
-            for j = 1:Q
-                if i <= M && j<= N
-                    fp(i,j) = f(i,j);
-                else
-                    fp(i,j) = 0;
-                end
-            end
-        end
     end
     
-    F = fftshift(fft2(fp)); 
+    F = fftshift(fft2(f, P, Q)); 
      
     u = 0:(P-1);
     v = 0:(Q-1);
