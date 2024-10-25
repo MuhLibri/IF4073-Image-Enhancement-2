@@ -13,11 +13,10 @@ function img = deconvolution(image, psf, nsr)
     H = padarray(psf, [pad_row, pad_col], 0, 'both');  % Pad with zeros on both sides
     [filter_row, filter_col] = size(H);
 
-    disp(pad_row);
-    if rem(pad_row, 2) == 0 && filter_row ~= image_row
+    if filter_row ~= image_row
         H = padarray(H, [1, 0], 0, 'pre');
     end
-    if rem(pad_col, 2) == 0 && filter_col ~= image_col
+    if filter_col ~= image_col
         H = padarray(H, [0, 1], 0, 'pre');
     end
     
