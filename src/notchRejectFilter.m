@@ -53,7 +53,7 @@ function img = notchRejectFilter(image, D0, threshold_factor, center_exclusion_r
             H = H .* H_notch;
         end
 
-        figure, imshow(H);
+        figure, imshow(H), title("Notch Filter");
         
         % Apply the combined notch filter to the Fourier-transformed image
         F_filtered = F_shifted .* H;
