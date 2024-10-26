@@ -1,3 +1,3 @@
 function img = saltPepperNoise(image, d)
-    Inoise = imnoise(I, 'salt & pepper', 0.1);
+    img = imnoise(image, 'salt & pepper', d);
 end
