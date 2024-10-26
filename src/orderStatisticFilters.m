@@ -39,18 +39,21 @@ function img = orderStatisticFilters(image, filter_dim, type, d)
                         case 'midpoint'
                             img(i, j, k) = (max(double(window), [], "all") + min(double(window), [], "all")) / 2;
                         case 'alpha-trimmed'
-                            % Flatten the window into a vector and sort it
+                            % Sort the values in the window
                             sorted_window = sort(double(window(:)));
-
-                            % Remove d smallest and d largest values, ensuring d is not too large
+            
+                            % Determine the number of elements to trim
                             trim_d = min(d, floor(length(sorted_window) / 2));
-                            trimmed_window = sorted_window(1+trim_d:end-trim_d);
-
-                            % Compute the mean of the trimmed window
-                            img(i, j, k) = mean(trimmed_window, "all");
+                            
+                            % Apply trimming
+                            trimmed_window = sorted_window(1 + trim_d:end - trim_d);
+            
+                            % Calculate the mean of the trimmed window
+                            img(i, j, k) = mean(trimmed_window);
                     end
                 end
             end
         end
     end
+    img = uint8(img);
 end
